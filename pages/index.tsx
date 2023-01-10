@@ -1,7 +1,33 @@
 import Head from "next/head";
 import { FunctionComponent } from "react";
 import { useState } from "react";
-import { PersoInfo, PlanInfo, ChosenAddOns, Summary } from "../modules/form/screen";
+import { UseCustomFormProvider } from "../modules/form/hooks/useCustomForm";
+import {
+  PersoInfo,
+  PlanInfo,
+  ChosenAddOns,
+  Summary,
+} from "../modules/form/screen";
+
+type Addons = "onlineServices" | "largerStorage" | "customProfile";
+
+interface StoredData {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  subscriptionType: "monthly" | "annualy";
+  plan: "arcade" | "advanced" | "pro";
+  addons: Addons[];
+}
+
+const initialValues: StoredData = {
+  addons: [],
+  email: "",
+  name: "",
+  phoneNumber: "",
+  plan: "pro",
+  subscriptionType: "monthly",
+};
 
 export default function Home() {
   const [selectedStep, setSelectedStep] = useState<number>(1);
@@ -14,8 +40,13 @@ export default function Home() {
     const isSelected = selectedStep === stepNumber;
 
     return (
-      <div className="flex my-2" onClick={() => setSelectedStep(stepNumber)}>
-        <h1 className="mx-4 border-2 rounded-full px-4 py-2">{stepNumber}</h1>
+      <div
+        className="flex my-2 cursor-pointer w-64"
+        onClick={() => setSelectedStep(stepNumber)}
+      >
+        <h1 className="mx-4 border rounded-full px-4 py-2 flex items-center justify-center">
+          {stepNumber}
+        </h1>
         <div>
           <p>STEP {stepNumber}</p>
           <h2>{name}</h2>
@@ -32,9 +63,9 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex">
+      <div>
         <div className="flex">
-          <nav className="bg-scroll p-4 m-4 rounded-lg bg-menu-sidebar">
+          <nav className="bg-scroll p-4 m-4 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 border-black border-2">
             <ol>
               <li>
                 <NavItem name="your Info" stepNumber={1} />
@@ -51,10 +82,12 @@ export default function Home() {
             </ol>
           </nav>
           <main>
-            {selectedStep === 1 && <PersoInfo />}
-            {selectedStep === 2 && <PlanInfo />}
-            {selectedStep === 3 && <ChosenAddOns />}
-            {selectedStep === 4 && <Summary />}
+            <UseCustomFormProvider<StoredData> initialValues={initialValues}>
+              {selectedStep === 1 && <PersoInfo />}
+              {selectedStep === 2 && <PlanInfo />}
+              {selectedStep === 3 && <ChosenAddOns />}
+              {selectedStep === 4 && <Summary />}
+            </UseCustomFormProvider>
           </main>
         </div>
       </div>
